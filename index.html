@@ -1,0 +1,485 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Calculadora de Física</title>
+  <link rel="stylesheet" href="estilos.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="script.js" defer></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function() {
+      const options = document.querySelectorAll(".option");
+      const calcSections = document.querySelectorAll(".calc-section");
+
+      options.forEach((option, index) => {
+        option.addEventListener("click", function() {
+          // Ocultar todas las secciones de cálculo
+          calcSections.forEach((section) => {
+            section.classList.remove("active");
+          });
+
+          // Mostrar la sección de cálculo seleccionada
+          calcSections[index].classList.add("active");
+        });
+      });
+
+      const aceleracionForm = document.getElementById("aceleracion-form");
+      aceleracionForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const deltaV = parseFloat(document.getElementById("delta-v").value);
+        const deltaT = parseFloat(document.getElementById("delta-t").value);
+        const resultado = deltaV / deltaT;
+        document.getElementById("aceleracion-result").textContent = "La aceleración es: " + resultado.toFixed(2);
+
+        // Gráfico
+        const aceleracionChart = document.getElementById("aceleracion-chart").getContext("2d");
+        if (window.aceleracionChart) {
+          window.aceleracionChart.destroy();
+        }
+        window.aceleracionChart = new Chart(aceleracionChart, {
+          type: "bar",
+          data: {
+            labels: ["Aceleración"],
+            datasets: [
+              {
+                label: "Aceleración",
+                backgroundColor: "#42a5f5",
+                data: [resultado.toFixed(2)]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+
+      const fuerzaForm = document.getElementById("fuerza-form");
+      fuerzaForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const constanteG = parseFloat(document.getElementById("constante-gravitacional").value);
+        const masa1 = parseFloat(document.getElementById("masa-1").value);
+        const masa2 = parseFloat(document.getElementById("masa-2").value);
+        const distancia = parseFloat(document.getElementById("distancia").value);
+        const resultado = (constanteG * masa1 * masa2) / Math.pow(distancia, 2);
+        document.getElementById("fuerza-result").textContent = "La fuerza gravitacional es: " + resultado.toFixed(2);
+
+        // Gráfico
+        const fuerzaChart = document.getElementById("fuerza-chart").getContext("2d");
+        if (window.fuerzaChart) {
+          window.fuerzaChart.destroy();
+        }
+        window.fuerzaChart = new Chart(fuerzaChart, {
+          type: "bar",
+          data: {
+            labels: ["Fuerza gravitacional"],
+            datasets: [
+              {
+                label: "Fuerza gravitacional",
+                backgroundColor: "#42a5f5",
+                data: [resultado.toFixed(2)]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+
+      const fuerzaResultanteForm = document.getElementById("fuerza-resultante-form");
+      const fuerzasContainer = document.getElementById("fuerzas-container");
+      const addFuerzaBtn = document.getElementById("add-fuerza-btn");
+
+      addFuerzaBtn.addEventListener("click", function() {
+        const newInput = document.createElement("div");
+        newInput.classList.add("input-group");
+        newInput.innerHTML = `
+          <label for="fuerza-${fuerzasContainer.children.length + 1}">F${fuerzasContainer.children.length + 1}:</label>
+          <input type="number" class="fuerza-input" required>
+        `;
+        fuerzasContainer.appendChild(newInput);
+      });
+
+      fuerzaResultanteForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const fuerzasInputs = document.querySelectorAll(".fuerza-input");
+        let fuerzas = [];
+        fuerzasInputs.forEach((input) => {
+          const valor = parseFloat(input.value);
+          if (!isNaN(valor)) {
+            fuerzas.push(valor);
+          }
+        });
+        const sumaCuadrados = fuerzas.reduce((acumulador, fuerza) => acumulador + Math.pow(fuerza, 2), 0);
+        const resultado = Math.sqrt(sumaCuadrados);
+        document.getElementById("fuerza-resultante-result").textContent = "La fuerza resultante es: " + resultado.toFixed(2);
+
+        // Gráfico
+        const fuerzaResultanteChart = document.getElementById("fuerza-resultante-chart").getContext("2d");
+        if (window.fuerzaResultanteChart) {
+          window.fuerzaResultanteChart.destroy();
+        }
+        window.fuerzaResultanteChart = new Chart(fuerzaResultanteChart, {
+          type: "bar",
+          data: {
+            labels: ["Fuerza resultante"],
+            datasets: [
+              {
+                label: "Fuerza resultante",
+                backgroundColor: "#42a5f5",
+                data: [resultado.toFixed(2)]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+
+      const trabajoRealizadoForm = document.getElementById("trabajo-realizado-form");
+      trabajoRealizadoForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const fuerza = parseFloat(document.getElementById("fuerza-trabajo").value);
+        const distancia = parseFloat(document.getElementById("distancia-trabajo").value);
+        const angulo = parseFloat(document.getElementById("angulo").value);
+        const resultado = fuerza * distancia * Math.cos(angulo);
+        document.getElementById("trabajo-realizado-result").textContent = "El trabajo realizado es: " + resultado.toFixed(2);
+
+        // Gráfico
+        const trabajoRealizadoChart = document.getElementById("trabajo-realizado-chart").getContext("2d");
+        if (window.trabajoRealizadoChart) {
+          window.trabajoRealizadoChart.destroy();
+        }
+        window.trabajoRealizadoChart = new Chart(trabajoRealizadoChart, {
+          type: "bar",
+          data: {
+            labels: ["Trabajo realizado"],
+            datasets: [
+              {
+                label: "Trabajo realizado",
+                backgroundColor: "#42a5f5",
+                data: [resultado.toFixed(2)]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+
+      const energiaCineticaForm = document.getElementById("energia-cinetica-form");
+      energiaCineticaForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const masa = parseFloat(document.getElementById("masa-ec").value);
+        const velocidad = parseFloat(document.getElementById("velocidad").value);
+        const resultado = (1/2) * masa * Math.pow(velocidad, 2);
+        document.getElementById("energia-cinetica-result").textContent = "La energía cinética es: " + resultado.toFixed(2);
+
+        // Gráfico
+        const energiaCineticaChart = document.getElementById("energia-cinetica-chart").getContext("2d");
+        if (window.energiaCineticaChart) {
+          window.energiaCineticaChart.destroy();
+        }
+        window.energiaCineticaChart = new Chart(energiaCineticaChart, {
+          type: "bar",
+          data: {
+            labels: ["Energía cinética"],
+            datasets: [
+              {
+                label: "Energía cinética",
+                backgroundColor: "#42a5f5",
+                data: [resultado.toFixed(2)]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+
+      const energiaPotencialForm = document.getElementById("energia-potencial-form");
+      energiaPotencialForm.addEventListener("submit", function(e) {
+        e.preventDefault();
+        const masa = parseFloat(document.getElementById("masa-potencial").value);
+        const gravedad = parseFloat(document.getElementById("gravedad").value);
+        const altura = parseFloat(document.getElementById("altura").value);
+        const resultado = masa * gravedad * altura;
+        document.getElementById("energia-potencial-result").textContent = "La energía potencial es: " + resultado.toFixed(2);
+
+        // Gráfico
+        const energiaPotencialChart = document.getElementById("energia-potencial-chart").getContext("2d");
+        if (window.energiaPotencialChart) {
+          window.energiaPotencialChart.destroy();
+        }
+        window.energiaPotencialChart = new Chart(energiaPotencialChart, {
+          type: "bar",
+          data: {
+            labels: ["Energía potencial"],
+            datasets: [
+              {
+                label: "Energía potencial",
+                backgroundColor: "#42a5f5",
+                data: [resultado.toFixed(2)]
+              }
+            ]
+          },
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+              y: {
+                beginAtZero: true
+              }
+            }
+          }
+        });
+      });
+    });
+  </script>
+</head>
+<body>
+  <header>
+    <h1>Calculadora de Física</h1>
+  </header>
+
+  <main>
+    <div class="options">
+      <div class="option">
+        <h2>Aceleración</h2>
+        <p>Calcula la aceleración de un objeto.</p>
+      </div>
+      <div class="option">
+        <h2>Fuerza gravitacional</h2>
+        <p>Calcula la fuerza gravitacional entre dos objetos.</p>
+      </div>
+      <div class="option">
+        <h2>Fuerza resultante</h2>
+        <p>Calcula la fuerza resultante de varias fuerzas.</p>
+      </div>
+      <div class="option">
+        <h2>Trabajo realizado</h2>
+        <p>Calcula el trabajo realizado por una fuerza.</p>
+      </div>
+      <div class="option">
+        <h2>Energía cinética</h2>
+        <p>Calcula la energía cinética de un objeto.</p>
+      </div>
+      <div class="option">
+        <h2>Energía potencial</h2>
+        <p>Calcula la energía potencial de un objeto.</p>
+      </div>
+    </div>
+
+    <section id="aceleracion-section" class="calc-section">
+      <h2>Aceleración</h2>
+      <div class="calculator">
+        <h3>Fórmula</h3>
+        <p>a = Δv / Δt</p>
+        <form id="aceleracion-form">
+          <div class="input-group">
+            <label for="delta-v">Δv:</label>
+            <input type="number" id="delta-v" required>
+          </div>
+          <div class="input-group">
+            <label for="delta-t">Δt:</label>
+            <input type="number" id="delta-t" required>
+          </div>
+          <button type="submit">Calcular</button>
+        </form>
+      </div>
+      <div class="result">
+        <h3>Resultado</h3>
+        <p id="aceleracion-result"></p>
+        <div class="chart-container">
+          <canvas id="aceleracion-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="fuerza-section" class="calc-section">
+      <h2>Fuerza gravitacional</h2>
+      <div class="calculator">
+        <h3>Fórmula</h3>
+        <p>F = (G * m1 * m2) / r²</p>
+        <form id="fuerza-form">
+          <div class="input-group">
+            <label for="constante-gravitacional">G:</label>
+            <input type="number" id="constante-gravitacional" required>
+          </div>
+          <div class="input-group">
+            <label for="masa-1">m1:</label>
+            <input type="number" id="masa-1" required>
+          </div>
+          <div class="input-group">
+            <label for="masa-2">m2:</label>
+            <input type="number" id="masa-2" required>
+          </div>
+          <div class="input-group">
+            <label for="distancia">r:</label>
+            <input type="number" id="distancia" required>
+          </div>
+          <button type="submit">Calcular</button>
+        </form>
+      </div>
+      <div class="result">
+        <h3>Resultado</h3>
+        <p id="fuerza-result"></p>
+        <div class="chart-container">
+          <canvas id="fuerza-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="fuerza-resultante-section" class="calc-section">
+      <h2>Fuerza resultante</h2>
+      <div class="calculator">
+        <h3>Fórmula</h3>
+        <p>Fres = √(F1² + F2² + F3² + ...)</p>
+        <form id="fuerza-resultante-form">
+          <div id="fuerzas-container">
+            <div class="input-group">
+              <label for="fuerza-1">F1:</label>
+              <input type="number" class="fuerza-input" required>
+            </div>
+          </div>
+          <button type="button" id="add-fuerza-btn">Agregar Fuerza</button>
+          <button type="submit">Calcular</button>
+        </form>
+      </div>
+      <div class="result">
+        <h3>Resultado</h3>
+        <p id="fuerza-resultante-result"></p>
+        <div class="chart-container">
+          <canvas id="fuerza-resultante-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="trabajo-realizado-section" class="calc-section">
+      <h2>Trabajo realizado</h2>
+      <div class="calculator">
+        <h3>Fórmula</h3>
+        <p>Trabajo = F * d * cos(θ)</p>
+        <form id="trabajo-realizado-form">
+          <div class="input-group">
+            <label for="fuerza-trabajo">F:</label>
+            <input type="number" id="fuerza-trabajo" required>
+          </div>
+          <div class="input-group">
+            <label for="distancia-trabajo">d:</label>
+            <input type="number" id="distancia-trabajo" required>
+          </div>
+          <div class="input-group">
+            <label for="angulo">θ:</label>
+            <input type="number" id="angulo" required>
+          </div>
+          <button type="submit">Calcular</button>
+        </form>
+      </div>
+      <div class="result">
+        <h3>Resultado</h3>
+        <p id="trabajo-realizado-result"></p>
+        <div class="chart-container">
+          <canvas id="trabajo-realizado-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="energia-cinetica-section" class="calc-section">
+      <h2>Energía cinética</h2>
+      <div class="calculator">
+        <h3>Fórmula</h3>
+        <p>EC = (1/2) * m * v²</p>
+        <form id="energia-cinetica-form">
+          <div class="input-group">
+            <label for="masa-ec">m:</label>
+            <input type="number" id="masa-ec" required>
+          </div>
+          <div class="input-group">
+            <label for="velocidad">v:</label>
+            <input type="number" id="velocidad" required>
+          </div>
+          <button type="submit">Calcular</button>
+        </form>
+      </div>
+      <div class="result">
+        <h3>Resultado</h3>
+        <p id="energia-cinetica-result"></p>
+        <div class="chart-container">
+          <canvas id="energia-cinetica-chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <section id="energia-potencial-section" class="calc-section">
+      <h2>Energía potencial</h2>
+      <div class="calculator">
+        <h3>Fórmula</h3>
+        <p>EP = m * g * h</p>
+        <form id="energia-potencial-form">
+          <div class="input-group">
+            <label for="masa-potencial">m:</label>
+            <input type="number" id="masa-potencial" required>
+          </div>
+          <div class="input-group">
+            <label for="gravedad">g:</label>
+            <input type="number" id="gravedad" required>
+          </div>
+          <div class="input-group">
+            <label for="altura">h:</label>
+            <input type="number" id="altura" required>
+          </div>
+          <button type="submit">Calcular</button>
+        </form>
+      </div>
+      <div class="result">
+        <h3>Resultado</h3>
+        <p id="energia-potencial-result"></p>
+        <div class="chart-container">
+          <canvas id="energia-potencial-chart"></canvas>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>Proyecto realizado por:</p>
+     <p>Misael FP y Fer CR</p>
+  </footer>
+</body>
+</html>
