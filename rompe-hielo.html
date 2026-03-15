@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Preguntas para Romper el Hielo</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ─── Variables de tema ─────────────────────────────────────────── */
+    :root {
+      --cream:   #fdf6ec;
+      --sand:    #f0e4cc;
+      --warm:    #e8c99a;
+      --accent:  #c9622f;
+      --accent2: #e8855a;
+      --dark:    #2b1d0e;
+      --mid:     #7a4a2a;
+      --light:   #fff8f0;
+      --shadow:  rgba(43, 29, 14, 0.12);
+    }
+
+    /* ─── Reset & base ──────────────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      background-color: var(--cream);
+      background-image:
+        radial-gradient(ellipse 80% 60% at 20% 10%, #f5dbb5 0%, transparent 55%),
+        radial-gradient(ellipse 60% 50% at 80% 90%, #f0c999 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg width='52' height='52' viewBox='0 0 52 52' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9622f' fill-opacity='0.04'%3E%3Cpath d='M0 0h26v26H0zM26 26h26v26H26z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      font-family: 'DM Sans', sans-serif;
+      color: var(--dark);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 20px 60px;
+    }
+
+    /* ─── Encabezado ────────────────────────────────────────────────── */
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+      max-width: 600px;
+    }
+
+    .emoji-top {
+      font-size: 3rem;
+      display: block;
+      margin-bottom: 12px;
+      animation: float 3s ease-in-out infinite;
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-8px); }
+    }
+
+    h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      color: var(--dark);
+      letter-spacing: -0.5px;
+    }
+
+    h1 span {
+      color: var(--accent);
+    }
+
+    .subtitle {
+      margin-top: 14px;
+      font-size: 1rem;
+      font-weight: 300;
+      color: var(--mid);
+      line-height: 1.6;
+      max-width: 440px;
+      margin-inline: auto;
+    }
+
+    /* ─── Tarjeta de pregunta ───────────────────────────────────────── */
+    .card-wrapper {
+      width: 100%;
+      max-width: 620px;
+      min-height: 220px;
+      perspective: 1000px;
+      margin-bottom: 36px;
+    }
+
+    .card {
+      background: var(--light);
+      border: 1.5px solid var(--warm);
+      border-radius: 24px;
+      padding: 48px 40px;
+      box-shadow:
+        0 4px 6px var(--shadow),
+        0 16px 40px rgba(43, 29, 14, 0.08),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+      position: relative;
+      overflow: hidden;
+      min-height: 220px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+      box-shadow:
+        0 6px 10px var(--shadow),
+        0 24px 50px rgba(43, 29, 14, 0.12),
+        inset 0 1px 0 rgba(255,255,255,0.9);
+    }
+
+    /* Decoración esquina */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: -30px; right: -30px;
+      width: 120px; height: 120px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f5c98a 0%, transparent 70%);
+      opacity: 0.6;
+    }
+
+    .card::after {
+      content: '';
+      position: absolute;
+      bottom: -20px; left: -20px;
+      width: 90px; height: 90px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #f0b070 0%, transparent 70%);
+      opacity: 0.4;
+    }
+
+    /* Placeholder inicial */
+    .card-placeholder {
+      text-align: center;
+      color: var(--warm);
+    }
+
+    .card-placeholder .big-emoji {
+      font-size: 3.5rem;
+      display: block;
+      margin-bottom: 12px;
+    }
+
+    .card-placeholder p {
+      font-size: 1rem;
+      font-style: italic;
+      color: var(--warm);
+    }
+
+    /* Pregunta activa */
+    .card-question {
+      display: none;
+      flex-direction: column;
+    }
+
+    .question-label {
+      font-size: 0.72rem;
+      font-weight: 500;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      color: var(--accent);
+      margin-bottom: 16px;
+    }
+
+    .question-text {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.25rem, 3vw, 1.7rem);
+      font-weight: 700;
+      line-height: 1.45;
+      color: var(--dark);
+      position: relative;
+      z-index: 1;
+    }
+
+    .question-emoji {
+      font-size: 1.6rem;
+      margin-top: 20px;
+    }
+
+    /* Animación flip de la tarjeta */
+    @keyframes cardFlipIn {
+      0%   { opacity: 0; transform: rotateY(-18deg) scale(0.95); }
+      100% { opacity: 1; transform: rotateY(0deg)   scale(1); }
+    }
+
+    .card.animating {
+      animation: cardFlipIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+
+    /* ─── Controles ─────────────────────────────────────────────────── */
+    .controls {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      width: 100%;
+      max-width: 620px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      padding: 18px 32px;
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      border-radius: 16px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 500;
+      letter-spacing: 0.3px;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      box-shadow: 0 4px 18px rgba(201, 98, 47, 0.35);
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: rgba(255,255,255,0.15);
+      opacity: 0;
+      transition: opacity 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent2);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(201, 98, 47, 0.4);
+    }
+
+    .btn-primary:hover::after { opacity: 1; }
+
+    .btn-primary:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 10px rgba(201, 98, 47, 0.3);
+    }
+
+    .btn-primary .btn-icon { margin-right: 8px; }
+
+    /* Botón secundario: Copiar */
+    .btn-secondary {
+      padding: 12px 28px;
+      background: transparent;
+      color: var(--mid);
+      border: 1.5px solid var(--warm);
+      border-radius: 12px;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      transition: background 0.2s, color 0.2s, border-color 0.2s, transform 0.15s;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(6px);
+    }
+
+    .btn-secondary.visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(0);
+      transition: background 0.2s, color 0.2s, border-color 0.2s,
+                  opacity 0.35s ease, transform 0.35s ease;
+    }
+
+    .btn-secondary:hover {
+      background: var(--sand);
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-secondary.copied {
+      background: #e6f4ea;
+      border-color: #5a9e6f;
+      color: #2e7d4f;
+    }
+
+    /* ─── Contador ──────────────────────────────────────────────────── */
+    .counter {
+      margin-top: 28px;
+      font-size: 0.82rem;
+      font-weight: 400;
+      color: var(--warm);
+      letter-spacing: 0.5px;
+      transition: color 0.3s;
+    }
+
+    .counter span {
+      color: var(--accent);
+      font-weight: 700;
+    }
+
+    /* ─── Footer ────────────────────────────────────────────────────── */
+    footer {
+      margin-top: 56px;
+      font-size: 0.78rem;
+      color: var(--warm);
+      text-align: center;
+    }
+
+    /* ─── Responsive ────────────────────────────────────────────────── */
+    @media (max-width: 480px) {
+      body { padding: 28px 16px 48px; }
+      .card { padding: 36px 24px; }
+      .btn-primary { padding: 16px 24px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ══ Encabezado ══════════════════════════════════════════════════════ -->
+  <header>
+    <span class="emoji-top">✨</span>
+    <h1>Preguntas para<br><span>Romper el Hielo</span></h1>
+    <p class="subtitle">Haz clic y descubre una pregunta para iniciar una conversación interesante</p>
+  </header>
+
+  <!-- ══ Tarjeta de pregunta ═════════════════════════════════════════════ -->
+  <div class="card-wrapper">
+    <div class="card" id="card">
+
+      <!-- Estado inicial (placeholder) -->
+      <div class="card-placeholder" id="placeholder">
+        <span class="big-emoji">💬</span>
+        <p>Tu pregunta aparecerá aquí…</p>
+      </div>
+
+      <!-- Pregunta activa -->
+      <div class="card-question" id="questionBlock">
+        <span class="question-label">✦ Pregunta del momento</span>
+        <p class="question-text" id="questionText"></p>
+        <span class="question-emoji" id="questionEmoji"></span>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ══ Controles ═══════════════════════════════════════════════════════ -->
+  <div class="controls">
+    <button class="btn-primary" id="btnNew" onclick="newQuestion()">
+      <span class="btn-icon">🎲</span> Nueva pregunta
+    </button>
+    <button class="btn-secondary" id="btnCopy" onclick="copyQuestion()">
+      <span>📋</span> Copiar pregunta
+    </button>
+  </div>
+
+  <!-- ══ Contador ════════════════════════════════════════════════════════ -->
+  <p class="counter" id="counter">Has visto <span id="countNum">0</span> de 45 preguntas</p>
+
+  <footer>Hecho con ☕ para romper el hielo en cualquier reunión</footer>
+
+  <!-- ══ JavaScript ══════════════════════════════════════════════════════ -->
+  <script>
+    /* ── Banco de preguntas con emoji temático ─────────────────────────── */
+    const preguntas = [
+      { texto: "¿Cuál es tu mayor miedo y por qué?",                            emoji: "😨" },
+      { texto: "¿Qué te gusta hacer cuando estás solo/a?",                      emoji: "🎧" },
+      { texto: "¿Qué harías si tuvieras un año libre para viajar?",             emoji: "🌍" },
+      { texto: "¿Cuál ha sido el momento más divertido de tu vida?",            emoji: "😂" },
+      { texto: "¿Qué superpoder te gustaría tener?",                            emoji: "🦸" },
+      { texto: "¿Qué sueño te gustaría cumplir algún día?",                     emoji: "🌟" },
+      { texto: "¿Qué es algo que la mayoría de la gente no sabe sobre ti?",     emoji: "🤫" },
+      { texto: "¿Cuál es tu recuerdo favorito de la infancia?",                 emoji: "🧸" },
+      { texto: "Si pudieras cenar con cualquier persona de la historia, ¿quién sería?", emoji: "🍽️" },
+      { texto: "¿Qué canción describe perfectamente tu vida en este momento?",  emoji: "🎵" },
+      { texto: "¿Qué habilidad nueva te gustaría aprender este año?",           emoji: "📚" },
+      { texto: "¿Cuál es el lugar más increíble que has visitado?",             emoji: "🗺️" },
+      { texto: "¿Qué película o serie podrías ver una y otra vez sin cansarte?",emoji: "🎬" },
+      { texto: "¿Eres más de madrugada o de mañana, y por qué?",               emoji: "🌙" },
+      { texto: "¿Cuál es el objeto más valioso que tienes, sin contar dinero?", emoji: "💎" },
+      { texto: "Si fueras un animal, ¿cuál serías y por qué?",                  emoji: "🦊" },
+      { texto: "¿Cuál ha sido la decisión más difícil que has tomado?",         emoji: "🤔" },
+      { texto: "¿Qué libro cambió tu forma de ver el mundo?",                   emoji: "📖" },
+      { texto: "¿En qué época de la historia te hubiera gustado vivir?",        emoji: "⏳" },
+      { texto: "¿Cuál es tu comida favorita y qué recuerdo te trae?",           emoji: "🍜" },
+      { texto: "¿Qué consejo le darías a tu yo de hace 10 años?",               emoji: "💌" },
+      { texto: "¿Cuál es tu tradición familiar favorita?",                      emoji: "🏡" },
+      { texto: "¿Qué cosa pequeña te pone de muy buen humor?",                  emoji: "☀️" },
+      { texto: "¿Cuál sería tu trabajo ideal si el dinero no importara?",       emoji: "✨" },
+      { texto: "¿Prefieres el mar o la montaña? ¿Por qué?",                    emoji: "🏔️" },
+      { texto: "¿Qué es algo de lo que te sientes genuinamente orgulloso/a?",  emoji: "🏅" },
+      { texto: "¿Cuál es el mejor regalo que has recibido en tu vida?",        emoji: "🎁" },
+      { texto: "¿Qué te gustaría que la gente dijera de ti cuando ya no estés?", emoji: "🕊️" },
+      { texto: "Si pudieras vivir en cualquier ciudad del mundo, ¿dónde sería?", emoji: "🏙️" },
+      { texto: "¿Cuál fue la última vez que saliste de tu zona de confort?",    emoji: "🚀" },
+      { texto: "¿Qué es algo que siempre quisiste intentar pero nunca te animaste?", emoji: "💪" },
+      { texto: "¿Cuál es tu mayor fuente de inspiración diaria?",               emoji: "🌈" },
+      { texto: "¿Qué es lo primero que haces cuando te despiertas?",           emoji: "☕" },
+      { texto: "¿Cuál es la mejor lección que te enseñó un fracaso?",          emoji: "🌱" },
+      { texto: "¿Qué tipo de viajero/a eres: planificador o improvisador?",    emoji: "🧳" },
+      { texto: "¿Tienes alguna fobia extraña o poco común?",                    emoji: "😅" },
+      { texto: "¿Cuál es tu forma favorita de desconectarte del estrés?",      emoji: "🧘" },
+      { texto: "¿Qué es algo que te gustaría aprender antes de morir?",        emoji: "🎯" },
+      { texto: "Si pudieras cambiar una cosa del mundo, ¿qué sería?",          emoji: "🌐" },
+      { texto: "¿Cuál es la aventura más loca que has vivido?",                emoji: "🎢" },
+      { texto: "¿Qué personaje de ficción se parece más a ti y por qué?",      emoji: "🦸‍♀️" },
+      { texto: "¿Qué te hace reír sin parar?",                                  emoji: "🤣" },
+      { texto: "¿Cuál es el hábito que más te cuesta mantener?",               emoji: "📅" },
+      { texto: "¿Qué es lo más espontáneo que has hecho en tu vida?",          emoji: "⚡" },
+      { texto: "Si pudieras dominar un idioma instantáneamente, ¿cuál elegirías?", emoji: "🗣️" },
+    ];
+
+    /* ── Estado ────────────────────────────────────────────────────────── */
+    let seen      = new Set();   // índices ya mostrados
+    let totalVist = 0;           // contador de vistas
+    let currentText = "";        // texto de la pregunta actual
+
+    /* ── Selección aleatoria sin repetir seguida ────────────────────────── */
+    function getRandomIndex() {
+      // Si ya vimos todas, reiniciamos el set
+      if (seen.size >= preguntas.length) seen.clear();
+
+      let idx;
+      do { idx = Math.floor(Math.random() * preguntas.length); }
+      while (seen.has(idx));
+
+      seen.add(idx);
+      return idx;
+    }
+
+    /* ── Mostrar nueva pregunta ─────────────────────────────────────────── */
+    function newQuestion() {
+      const idx       = getRandomIndex();
+      const pregunta  = preguntas[idx];
+      currentText     = pregunta.texto;
+      totalVist++;
+
+      const card          = document.getElementById("card");
+      const placeholder   = document.getElementById("placeholder");
+      const questionBlock = document.getElementById("questionBlock");
+      const questionText  = document.getElementById("questionText");
+      const questionEmoji = document.getElementById("questionEmoji");
+      const btnCopy       = document.getElementById("btnCopy");
+      const countNum      = document.getElementById("countNum");
+
+      // Ocultamos placeholder la primera vez
+      placeholder.style.display = "none";
+      questionBlock.style.display = "flex";
+
+      // Actualizamos contenido
+      questionText.textContent  = pregunta.texto;
+      questionEmoji.textContent = pregunta.emoji;
+
+      // Animación de la tarjeta
+      card.classList.remove("animating");
+      void card.offsetWidth; // fuerza reflow para reiniciar animación
+      card.classList.add("animating");
+
+      // Mostrar botón copiar
+      btnCopy.classList.add("visible");
+      btnCopy.classList.remove("copied");
+      btnCopy.innerHTML = "<span>📋</span> Copiar pregunta";
+
+      // Actualizar contador
+      countNum.textContent = totalVist;
+    }
+
+    /* ── Copiar pregunta al portapapeles ──────────────────────────────── */
+    function copyQuestion() {
+      if (!currentText) return;
+      const btn = document.getElementById("btnCopy");
+
+      navigator.clipboard.writeText(currentText)
+        .then(() => {
+          btn.classList.add("copied");
+          btn.innerHTML = "<span>✅</span> ¡Copiado!";
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.innerHTML = "<span>📋</span> Copiar pregunta";
+          }, 2200);
+        })
+        .catch(() => {
+          // Fallback para navegadores sin soporte de clipboard
+          const ta = document.createElement("textarea");
+          ta.value = currentText;
+          document.body.appendChild(ta);
+          ta.select();
+          document.execCommand("copy");
+          document.body.removeChild(ta);
+          btn.classList.add("copied");
+          btn.innerHTML = "<span>✅</span> ¡Copiado!";
+          setTimeout(() => {
+            btn.classList.remove("copied");
+            btn.innerHTML = "<span>📋</span> Copiar pregunta";
+          }, 2200);
+        });
+    }
+  </script>
+</body>
+</html>
